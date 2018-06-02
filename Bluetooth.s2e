@@ -44,7 +44,7 @@
 		{"encode":"{d0}{d1}","setup":"pinMode({0},OUTPUT);\n","inc":"","def":"","work":"analogWrite({0},{1});\n","loop":""}],
 
 		["w", "mix neopixel LED color: Red %n Green %n Blue %n","neopixel", 0, 0, 0,
-		{"encode":"{d0}{d1}{d2}","setup":"","inc":"","def":"","work":"pixels.setPixelColor(0, pixels.Color(0,150,0));\npixels.show();\n","loop":""}],
+		{"encode":"{d0}{d1}{d2}","setup":"","inc":"","def":"","work":"pixels.setPixelColor(0, pixels.Color({0},{1},{2}));\npixels.show();\n","loop":""}],
 		
 		["w", "play tone pin %n on note %d.notes beat %d.beats","runTone", "9", "C4","Half",
 		{"encode":"{d0}{s1}{s2}","setup":"pinMode({0},OUTPUT);\n","inc":"","def":"","work":"tone({0},{1},{2}); // write to buzzer\ndelay({2});\n","loop":""}],
