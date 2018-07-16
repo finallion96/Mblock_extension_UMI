@@ -17,8 +17,16 @@
 		["w", "%d.side motor moves %d.direction with speed %n","motor setup","LEFT","Forward","255",
 		{"encode":"{d0}{d1}{d2}","setup":"    pinMode(4,OUTPUT);\n    pinMode(7,OUTPUT);\n    pinMode(5,OUTPUT);\n    pinMode(8,OUTPUT);\n    pinMode(9,OUTPUT);\n    pinMode(6,OUTPUT);\n","inc":"void Motor(boolean side, boolean direction, double speed);\n","def":"--separator--\nvoid Motor(boolean side, boolean direction, double speed)\n{\n  if(side == 0) analogWrite(5,speed);\n  if(side == 1) analogWrite(6,speed);\n  if(side == 0 && direction == 0) digitalWrite(4,0);\n  if(side == 0 && direction == 0) digitalWrite(7,1);\n  if(side == 0 && direction == 1) digitalWrite(4,1);\n  if(side == 0 && direction == 1) digitalWrite(7,0);\n  if(side == 1 && direction == 0) digitalWrite(8,0);\n  if(side == 1 && direction == 0) digitalWrite(9,1);\n  if(side == 1 && direction == 1) digitalWrite(8,1);\n  if(side == 1 && direction == 1) digitalWrite(9,0);\n}","work":"Motor({0},{1},{2});\n","loop":""}],
 
+		["B", "read IR remote (Carmp3) button %d.IRcode","myIR","Num0",
+		{"encode":"{d0}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\n--separator--void checkIR()--separator--{if(irrecv.decode(&results))--separator--{IRvalue = results.value;irrecv.resume();}}","work":"!(IRvalue - {0})","loop":"checkIR();\n"}],
+
+		["B", "read remote from channel %d.channel and button %d.button2","my2IR","channel-1","up",
+		{"encode":"{d0}{d1}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\nunsigned long lastSend = 0;\n--separator--void checkIR()\n--separator--{\nunsigned long nowSend = millis();\nif (irrecv.decode(&results))\n--separator--{\nIRvalue = results.value;\n irrecv.resume();\n}\nif (nowSend - lastSend > 1000)\n--separator--{\nIRvalue = 0;\nlastSend = millis();\n}\n}\nunsigned long irTable[5][8] =\n {\n0x1612BA6C,	0x8533DDE2,	0xF84832A1, 0xFB483758, 0xFB48375B,	0xD345B9CA,	0x9402085E,	0x17AC0181,\n0xE80D0B8F,	0x7486B545,	0x1D78D0E,	0x2D78EA3,	0x2D78EA0,	0x2ADA0C31,	0x6A1DBD9D,	0xB6555799,\n0x1DE889B0,	0x31C75E1C,	0xBB864390,	0xA37684BE,	0xA37684BD,	0x137DF0D4,	0x9BD7D7A2,	0xA37684BE,\n0x2B0A4B4B,	0x2E9A984F,	0xA4768653,	0xB8863ED9,	0xB8863EDA,	0x487ED2C3,	0x607D6A17,	0xF9529755,\n0x56DF12E8,	0xD90A24FA,	0x4C1E79B9,	0x4F1E7E70,	0x4F1E7E73,	0x271C00E2,	0x477FD157,	0xF57EFDE\n};\n","work":"!(IRvalue - irTable[{1}][{0}])","loop":"checkIR();\n"}],
+
+		/*
 		["B", "read IR code with recv pin %n and code %d.IRcode","myIR","2","Num0",
 		{"encode":"{d0}{d1}","setup":"irrecv_{0}.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv_{0}({0});\ndecode_results results_{0};\n--separator--int checkIR(unsigned long val)\n{\nint status = 0;\n--separator--if (irrecv_{0}.decode(&results_{0}))\n{\nif (results_{0}.value == val)\n{\nstatus = 1;\n}\nelse\n{\nstatus = 0;\n}\nirrecv_{0}.resume();\n}\nreturn status;\n}\n","work":"checkIR({1})","loop":""}],
+		*/
 
 		/*
 		["w", "send IR code type %d.IRtype output as %d.IRcode","sendIR", "NEC", "ASANO-UP",
@@ -115,7 +123,10 @@
 		"side": ["LEFT","RIGHT"],
 		"direction": ["Forward","Backward"],
 		"button":["Up","Down","Left","Right","Square","Triangle","Circle","X","On","Off"],
-		"IRcode": ["CH-","CH","CH+","PREV","NEXT","Play/Pause","Vol-","Vol+","EQ","Num0","100+","200+","Num1","Num2","Num3","Num4","Num5","Num6","Num7","Num8","Num9"]
+		"IRcode": ["CH-","CH","CH+","PREV","NEXT","Play/Pause","Vol-","Vol+","EQ","Num0","100+","200+","Num1","Num2","Num3","Num4","Num5","Num6","Num7","Num8","Num9"],
+		"button2":["up", "down", "left", "right", "f4"],
+		"channel":["channel-1", "channel-2", "channel-3", "channel-4", "channel-5", "channel-6", "channel-7", "channel-8"]
+
 
 		/*
 		"IRcode":["ASANO-POWER","ASANO-UP","ASANO-DOWN","ASANO-LEFT","ASANO-RIGHT","ASANO-OK","ASANO-MENU", "ASANO-CH+","ASANO-CH-","ASANO-VOL+","ASANO-VOL-","SONY-POWER", "SONY-UP","SONY-DOWN","SONY-LEFT","SONY-RIGHT","SONY-OK","SONY-MENU", "SONY-CH+","SONY-CH-","SONY-VOL+","SONY-VOL-","SAMSUNG-POWER", "SAMSUNG-UP","SAMSUNG-DOWN","SAMSUNG-LEFT","SAMSUNG-RIGHT","SAMSUNG-OK","SAMSUNG-MENU","SAMSUNG-CH+","SAMSUNG-CH-","SAMSUNG-VOL+","SAMSUNG-VOL-"],
@@ -145,6 +156,8 @@
 		"Half":500,"Quarter":250,"Eighth":125,"Whole":1000,"Double":2000,"Zero":0,
 		"Up": 1,"Down": 2,"Left": 3,"Right": 4,"Square": 5,"Triangle": 6,"Circle":7,"X":8,
 		"LEFT": 0, "RIGHT": 1,"Forward": 0,"Backward": 1,"On": 1,"Off": 0,
+		"up": 0, "down": 1, "left":2, "right":3, "f4": 4,
+		"channel-1": 0, "channel-2": 1, "channel-3": 2, "channel-4": 3, "channel-5": 4, "channel-6": 5, "channel-7": 6, "channel-8": 7,
 
 		"CH-": 0xFFA25D,
 		"CH": 0xFF629D,
