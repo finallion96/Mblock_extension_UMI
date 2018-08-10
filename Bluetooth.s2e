@@ -1,5 +1,5 @@
 {	"extensionName": "UMI",
-	"version":"2.0",
+	"version":"2.1",
 	"sort":1,
 	"extensionPort": 0,
 	"firmware":"1.1.103",
@@ -34,7 +34,7 @@
 		*/
 
 		["B", "read bluetooth code %d.button with baud-rate %n","check bluetooth","Up","9600",
-		{"encode":"{d0}{d1}","setup":"Serial.begin({1});\n","inc":"","def":"char state = 0;\n int check(int value)\n {\n if(Serial.available() > 0)\n {\n state = Serial.read();\n if(state == value+48) return 1;\n else return 0;\n }\n else return 0;\n }\n","work":"check({0})","loop":""}],
+		{"encode":"{d0}{d1}","setup":"Serial.begin({1});\n","inc":"","def":"char state = 0;\nunsigned long preSend = 0;\n--separator--void checkBlue()\n--separator--{\nunsigned long nowSend = millis();\n   if(Serial.available() > 0)\n--separator--{\nstate = Serial.read();\n }\nif (nowSend - preSend > 1000)\n--separator--{\nstate = 0;\npreSend = millis();\n}\n}\n","work":"!(state - {0} - 48)","loop":"checkBlue();\n"}],
 
 		["B", "read digital pin %n","getDigital","9",
 		{"encode":"{d0}","setup":"pinMode({0},INPUT);\n","inc":"","def":"","work":"digitalRead({0})","loop":""}],
@@ -122,7 +122,7 @@
 		"beats":["Half","Quarter","Eighth","Whole","Double","Zero"],
 		"side": ["LEFT","RIGHT"],
 		"direction": ["Forward","Backward"],
-		"button":["Up","Down","Left","Right","Square","Triangle","Circle","X","On","Off"],
+		"button":["Up","Down","Left","Right","Square","Triangle","Circle","X","On","Off","Null"],
 		"IRcode": ["CH-","CH","CH+","PREV","NEXT","Play/Pause","Vol-","Vol+","EQ","Num0","100+","200+","Num1","Num2","Num3","Num4","Num5","Num6","Num7","Num8","Num9"],
 		"button2":["up", "down", "left", "right", "f4"],
 		"channel":["channel-1", "channel-2", "channel-3", "channel-4", "channel-5", "channel-6", "channel-7", "channel-8"]
@@ -155,7 +155,7 @@
 			"C8":4186,"D8":4699,
 		"Half":500,"Quarter":250,"Eighth":125,"Whole":1000,"Double":2000,"Zero":0,
 		"Up": 1,"Down": 2,"Left": 3,"Right": 4,"Square": 5,"Triangle": 6,"Circle":7,"X":8,
-		"LEFT": 0, "RIGHT": 1,"Forward": 0,"Backward": 1,"On": 1,"Off": 0,
+		"LEFT": 0, "RIGHT": 1,"Forward": 0,"Backward": 1,"On": 1,"Off": 0,"Null": -48,
 		"up": 0, "down": 1, "left":2, "right":3, "f4": 4,
 		"channel-1": 0, "channel-2": 1, "channel-3": 2, "channel-4": 3, "channel-5": 4, "channel-6": 5, "channel-7": 6, "channel-8": 7,
 
