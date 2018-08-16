@@ -1,10 +1,10 @@
 {	"extensionName": "UMI",
-	"version":"2.1",
+	"version":"2.2",
 	"sort":1,
 	"extensionPort": 0,
 	"firmware":"1.1.103",
 	"javascriptURL":"js/arduino.js",
-	"author":"~ Hieu.P.M & Ninh.D.H ~ ",
+	"author":"~ Hieu.P.M ~ ",
 	"blockSpecs": [
 		["h","UMI Robot","runArduino",{"encode":"","setup":"pixels.begin();\npixels.clear();\npixels.show();\n","inc":"#include <Adafruit_NeoPixel.h>","def":"Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, 13, NEO_GRB + NEO_KHZ800);","work":"","loop":""}],
 
@@ -21,7 +21,7 @@
 		{"encode":"{d0}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\n--separator--void checkIR()--separator--{if(irrecv.decode(&results))--separator--{IRvalue = results.value;irrecv.resume();}}","work":"!(IRvalue - {0})","loop":"checkIR();\n"}],
 
 		["B", "read remote from channel %d.channel and button %d.button2","my2IR","channel-1","up",
-		{"encode":"{d0}{d1}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\nunsigned long lastSend = 0;\n--separator--void checkIR()\n--separator--{\nunsigned long nowSend = millis();\nif (irrecv.decode(&results))\n--separator--{\nIRvalue = results.value;\n irrecv.resume();\n}\nif (nowSend - lastSend > 1000)\n--separator--{\nIRvalue = 0;\nlastSend = millis();\n}\n}\nunsigned long irTable[5][8] =\n {\n0x1612BA6C,	0x8533DDE2,	0xF84832A1, 0xFB483758, 0xFB48375B,	0xD345B9CA,	0x9402085E,	0x17AC0181,\n0xE80D0B8F,	0x7486B545,	0x1D78D0E,	0x2D78EA3,	0x2D78EA0,	0x2ADA0C31,	0x6A1DBD9D,	0xB6555799,\n0x1DE889B0,	0x31C75E1C,	0xBB864390,	0xA37684BE,	0xA37684BD,	0x137DF0D4,	0x9BD7D7A2,	0xA37684BE,\n0x2B0A4B4B,	0x2E9A984F,	0xA4768653,	0xB8863ED9,	0xB8863EDA,	0x487ED2C3,	0x607D6A17,	0xF9529755,\n0x56DF12E8,	0xD90A24FA,	0x4C1E79B9,	0x4F1E7E70,	0x4F1E7E73,	0x271C00E2,	0x477FD157,	0xF57EFDE\n};\n","work":"!(IRvalue - irTable[{1}][{0}])","loop":"checkIR();\n"}],
+		{"encode":"{d0}{d1}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\nunsigned long lastSend = 0;\n--separator--void checkIR()\n--separator--{\nunsigned long nowSend = millis();\nif (irrecv.decode(&results))\n--separator--{\nIRvalue = results.value;\n irrecv.resume();\n}\nif (nowSend - lastSend > 1000)\n--separator--{\nIRvalue = 0;\nlastSend = millis();\n}\n}\nunsigned long irTable[6][8] =\n {\n0x1612BA6C,	0x8533DDE2,	0xF84832A1, 0xFB483758, 0xFB48375B,	0xD345B9CA,	0x9402085E,	0x17AC0181,\n0xE80D0B8F,	0x7486B545,	0x1D78D0E,	0x2D78EA3,	0x2D78EA0,	0x2ADA0C31,	0x6A1DBD9D,	0xB6555799,\n0x1DE889B0,	0x31C75E1C,	0xBB864390,	0xA37684BE,	0xA37684BD,	0x137DF0D4,	0x9BD7D7A2,	0xA37684BE,\n0x2B0A4B4B,	0x2E9A984F,	0xA4768653,	0xB8863ED9,	0xB8863EDA,	0x487ED2C3,	0x607D6A17,	0xF9529755,\n0x56DF12E8,	0xD90A24FA,	0x4C1E79B9,	0x4F1E7E70,	0x4F1E7E73,	0x271C00E2,	0x477FD157,	0xF57EFDE,\n 0, 0, 0, 0, 0, 0, 0, 0\n};\n","work":"!(IRvalue - irTable[{1}][{0}])","loop":"checkIR();\n"}],
 
 		/*
 		["B", "read IR code with recv pin %n and code %d.IRcode","myIR","2","Num0",
@@ -69,6 +69,8 @@
 		["R", "serial read byte", "serialRead",
 		{"setup":"Serial.begin(115200);\n","inc":"","def":"","work":"Serial.read()","loop":""}],
 
+		/*
+
 		["w", "[RF] Set node ID %n","Setnode","0",
 		{"encode":"{0}","setup":"mesh.setNodeID({0});\nmesh.begin();\n","inc":"#include <RF24.h>\n#include <RF24Network.h>\n#include <RF24Mesh.h>\n#include <SPI.h>\n","def":"RF24 radio(7,8);\nRF24Network network(radio);\nRF24Mesh mesh(radio,network);\n","work":"","loop":""}],
 
@@ -95,6 +97,8 @@
 
 		["R", "[RF] (Node) read from network","readNet","0",
 		{"encode":"","setup":"","inc":"#include <RF24.h>\n#include <RF24Network.h>\n#include <RF24Mesh.h>\n#include <SPI.h>\n","def":"RF24 radio(7,8);\nRF24Network network(radio);\nRF24Mesh mesh(radio,network);\n--separator--int networkRead()\n--separator--{\nRF24NetworkHeader header;\nint payload;\nnetwork.read(header, &payload, sizeof(payload));\nreturn payload;\n}\n","work":"networkRead()","loop":""}],
+
+		*/
 
 		["w", "Sleep %n seconds", "SleepTime","1",
 		{"encode":"{0}","setup":"","inc":"#include <Sleep_n0m1.h>\n","def":"Sleep sleep;\n--separator--void sleepTime(unsigned long timeSleep)\n--separator--{\nsleep.pwrDownMode();\nsleep.sleepDelay(timeSleep * 1000);\n}\n","work":"sleepTime({0});\n","loop":""}],
@@ -124,7 +128,7 @@
 		"direction": ["Forward","Backward"],
 		"button":["Up","Down","Left","Right","Square","Triangle","Circle","X","On","Off","Null"],
 		"IRcode": ["CH-","CH","CH+","PREV","NEXT","Play/Pause","Vol-","Vol+","EQ","Num0","100+","200+","Num1","Num2","Num3","Num4","Num5","Num6","Num7","Num8","Num9"],
-		"button2":["up", "down", "left", "right", "f4"],
+		"button2":["up", "down", "left", "right", "f4", "NULL"],
 		"channel":["channel-1", "channel-2", "channel-3", "channel-4", "channel-5", "channel-6", "channel-7", "channel-8"]
 
 
@@ -156,7 +160,7 @@
 		"Half":500,"Quarter":250,"Eighth":125,"Whole":1000,"Double":2000,"Zero":0,
 		"Up": 1,"Down": 2,"Left": 3,"Right": 4,"Square": 5,"Triangle": 6,"Circle":7,"X":8,
 		"LEFT": 0, "RIGHT": 1,"Forward": 0,"Backward": 1,"On": 1,"Off": 0,"Null": -48,
-		"up": 0, "down": 1, "left":2, "right":3, "f4": 4,
+		"up": 0, "down": 1, "left":2, "right":3, "f4": 4, "NULL": 5,
 		"channel-1": 0, "channel-2": 1, "channel-3": 2, "channel-4": 3, "channel-5": 4, "channel-6": 5, "channel-7": 6, "channel-8": 7,
 
 		"CH-": 0xFFA25D,
