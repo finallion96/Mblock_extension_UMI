@@ -1,5 +1,5 @@
 {	"extensionName": "UMI",
-	"version":"2.2",
+	"version":"2.3",
 	"sort":1,
 	"extensionPort": 0,
 	"firmware":"1.1.103",
@@ -8,17 +8,22 @@
 	"blockSpecs": [
 		["h","UMI Robot","runArduino",{"encode":"","setup":"pixels.begin();\npixels.clear();\npixels.show();\n","inc":"#include <Adafruit_NeoPixel.h>","def":"Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, 13, NEO_GRB + NEO_KHZ800);","work":"","loop":""}],
 
-		["w", "Blynk with auth-key %s","Blynkbegin","Your auth key",
-		{"encode":"{0}","setup":"Serial.begin(9600);\nBlynk.begin(Serial, auth);\n","inc":"#define BLYNK_USE_DIRECT_CONNECT\n#include <BlynkSimpleSerialBLE.h>\n","def":"char auth[] = {0};\n","work":"Blynk.run();\n","loop":""}],
-
-		["w", "Virtual pin %n to run servo %n","Virtual Pin","0","9",
-		{"encode":"{0}{1}","setup":"Servo_{1}.attach({1});\n","inc":"#include <Servo.h>\n","def":"Servo Servo_{1};\n--separator--BLYNK_WRITE(V{0}){\nint data{0} = param.asInt();\nServo_{1}.write(data{0});\ndelay(1000);\n}\n","work":"","loop":""}],
-
 		["w", "%d.side motor moves %d.direction with speed %n","motor setup","LEFT","Forward","255",
 		{"encode":"{d0}{d1}{d2}","setup":"    pinMode(4,OUTPUT);\n    pinMode(7,OUTPUT);\n    pinMode(5,OUTPUT);\n    pinMode(8,OUTPUT);\n    pinMode(9,OUTPUT);\n    pinMode(6,OUTPUT);\n","inc":"void Motor(boolean side, boolean direction, double speed);\n","def":"--separator--\nvoid Motor(boolean side, boolean direction, double speed)\n{\n  if(side == 0) analogWrite(5,speed);\n  if(side == 1) analogWrite(6,speed);\n  if(side == 0 && direction == 0) digitalWrite(4,0);\n  if(side == 0 && direction == 0) digitalWrite(7,1);\n  if(side == 0 && direction == 1) digitalWrite(4,1);\n  if(side == 0 && direction == 1) digitalWrite(7,0);\n  if(side == 1 && direction == 0) digitalWrite(8,0);\n  if(side == 1 && direction == 0) digitalWrite(9,1);\n  if(side == 1 && direction == 1) digitalWrite(8,1);\n  if(side == 1 && direction == 1) digitalWrite(9,0);\n}","work":"Motor({0},{1},{2});\n","loop":""}],
 
+		/*
 		["B", "read IR remote (Carmp3) button %d.IRcode","myIR","Num0",
 		{"encode":"{d0}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\n--separator--void checkIR()--separator--{if(irrecv.decode(&results))--separator--{IRvalue = results.value;irrecv.resume();}}","work":"!(IRvalue - {0})","loop":"checkIR();\n"}],
+		*/
+
+
+		["B", "read RFID tag","myRFID",
+		{"setup":"SPI.begin();\nmfrc522.PCD_Init();\npinMode(10, OUTPUT);\ndigitalWrite(10, 0);\n","inc":"\n#include <SPI.h>\n#include <MFRC522.h>\n","def":"MFRC522 mfrc522(8, 7);\nString myRFID = \"FF FF FF FF\";\nString readRFID()\n--separator--{\nif ( ! mfrc522.PICC_IsNewCardPresent()) \n--separator--{\nreturn \"FF FF FF FF\";\n}\nif ( ! mfrc522.PICC_ReadCardSerial())\n--separator--{	\nreturn \"FF FF FF FF\";\n}\nif (mfrc522.uid.size != 0)\n--separator--{\nString content = \"\";\nfor (byte i = 0; i < mfrc522.uid.size; i++)\n--separator--{\ncontent.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? \" 0\" : \" \"));\ncontent.concat(String(mfrc522.uid.uidByte[i], HEX));\n}\ncontent.toUpperCase();\nreturn content.substring(1);\n}\n}\n","work":"myRFID","loop":"myRFID = readRFID();\n"}],
+		/*
+
+		["B", "read RFID %s tag","myRFID","AA AA AA AA",
+		{"encode":"{s0}","setup":"SPI.begin();\nmfrc522.PCD_Init();\npinMode(10, OUTPUT);\ndigitalWrite(10, 0);\n","inc":"#include <SPI.h>\n#include <MFRC522.h>\n","def":"MFRC522 mfrc522(8, 7);\nString myRFID = "FF FF FF FF";\nString readRFID()\n--separator--{\nif ( ! mfrc522.PICC_IsNewCardPresent()) \n--separator--{\nreturn "FF FF FF FF";\n}\nif ( ! mfrc522.PICC_ReadCardSerial())\n--separator--{	\nreturn "FF FF FF FF";\n}\nif (mfrc522.uid.size != 0)\n--separator--{\nString content = "";\nfor (byte i = 0; i < mfrc522.uid.size; i++)\n--separator--{\ncontent.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));\ncontent.concat(String(mfrc522.uid.uidByte[i], HEX));\n}\ncontent.toUpperCase();\nreturn content.substring(1);\n}\n}\n","work":"myRFID == {0}"},"loop":"myRFID = readRFID();\n"}],
+		*/
 
 		["B", "read remote from channel %d.channel and button %d.button2","my2IR","channel-1","up",
 		{"encode":"{d0}{d1}","setup":"irrecv.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv(2);\ndecode_results results;\nunsigned long IRvalue = 0;\nunsigned long lastSend = 0;\n--separator--void checkIR()\n--separator--{\nunsigned long nowSend = millis();\nif (irrecv.decode(&results))\n--separator--{\nIRvalue = results.value;\n irrecv.resume();\n}\nif (nowSend - lastSend > 1000)\n--separator--{\nIRvalue = 0;\nlastSend = millis();\n}\n}\nunsigned long irTable[6][8] =\n {\n0x1612BA6C,	0x8533DDE2,	0xF84832A1, 0xFB483758, 0xFB48375B,	0xD345B9CA,	0x9402085E,	0x17AC0181,\n0xE80D0B8F,	0x7486B545,	0x1D78D0E,	0x2D78EA3,	0x2D78EA0,	0x2ADA0C31,	0x6A1DBD9D,	0xB6555799,\n0x1DE889B0,	0x31C75E1C,	0xBB864390,	0xA37684BE,	0xA37684BD,	0x137DF0D4,	0x9BD7D7A2,	0xA37684BE,\n0x2B0A4B4B,	0x2E9A984F,	0xA4768653,	0xB8863ED9,	0xB8863EDA,	0x487ED2C3,	0x607D6A17,	0xF9529755,\n0x56DF12E8,	0xD90A24FA,	0x4C1E79B9,	0x4F1E7E70,	0x4F1E7E73,	0x271C00E2,	0x477FD154,	0x1057F173,\n 0, 0, 0, 0, 0, 0, 0, 0\n};\n","work":"!(IRvalue - irTable[{1}][{0}])","loop":"checkIR();\n"}],
@@ -51,14 +56,14 @@
 		["w", "set pwm pin %n output as %d.pwmvalue","runPwm", "5", 0,
 		{"encode":"{d0}{d1}","setup":"pinMode({0},OUTPUT);\n","inc":"","def":"","work":"analogWrite({0},{1});\n","loop":""}],
 
+		["w", "set servo pin %n angle as %d.servovalue","runServoArduino", "9", 90,
+		{"encode":"{d0}{d1}","setup":"servo_{0}.attach({0}); // init pin\n","inc":"#include <Servo.h>\n","def":"Servo servo_{0};\n","work":"servo_{0}.write({1}); // write to servo\n","loop":""}],
+
 		["w", "mix neopixel LED color: Red %n Green %n Blue %n","neopixel", 0, 0, 0,
 		{"encode":"{d0}{d1}{d2}","setup":"","inc":"","def":"","work":"pixels.setPixelColor(0, pixels.Color({0},{1},{2}));\npixels.show();\n","loop":""}],
 		
 		["w", "play tone pin %n on note %d.notes beat %d.beats","runTone", "9", "C4","Half",
 		{"encode":"{d0}{s1}{s2}","setup":"pinMode({0},OUTPUT);\n","inc":"","def":"","work":"tone({0},{1},{2}); // write to buzzer\ndelay({2});\n","loop":""}],
-		
-		["w", "set servo pin %n angle as %d.servovalue","runServoArduino", "9", 90,
-		{"encode":"{d0}{d1}","setup":"servo_{0}.attach({0}); // init pin\n","inc":"#include <Servo.h>\n","def":"Servo servo_{0};\n","work":"servo_{0}.write({1}); // write to servo\n","loop":""}],
 		
 		["w", "serial write text %s", "serialWrite", "hello",
 		{"setup":"Serial.begin(115200);\n","inc":"","def":"","work":"Serial.println({0});\n","loop":""}],
@@ -98,13 +103,13 @@
 		["R", "[RF] (Node) read from network","readNet","0",
 		{"encode":"","setup":"","inc":"#include <RF24.h>\n#include <RF24Network.h>\n#include <RF24Mesh.h>\n#include <SPI.h>\n","def":"RF24 radio(7,8);\nRF24Network network(radio);\nRF24Mesh mesh(radio,network);\n--separator--int networkRead()\n--separator--{\nRF24NetworkHeader header;\nint payload;\nnetwork.read(header, &payload, sizeof(payload));\nreturn payload;\n}\n","work":"networkRead()","loop":""}],
 
-		*/
-
 		["w", "Sleep %n seconds", "SleepTime","1",
 		{"encode":"{0}","setup":"","inc":"#include <Sleep_n0m1.h>\n","def":"Sleep sleep;\n--separator--void sleepTime(unsigned long timeSleep)\n--separator--{\nsleep.pwrDownMode();\nsleep.sleepDelay(timeSleep * 1000);\n}\n","work":"sleepTime({0});\n","loop":""}],
 
 		["w", "Sleep interrupt pin %d.inter", "SleepInter","2",
 		{"encode":"{0}","setup":"","inc":"#include <Sleep_n0m1.h>\n","def":"Sleep sleep;\n--separator--void interruptSleep(int pin)\n--separator--{\nsleep.pwrDownMode();\n}\n","work":"interruptSleep({0});\n","loop":""}],
+
+		*/
 
 		["R", "read ultrasonic sensor trig pin %n echo pin %n","getUltrasonicArduino",13,12,
 		{"encode":"{d0}","setup":"","inc":"","def":"--separator--float getDistance(int trig,int echo){\npinMode(trig,OUTPUT);\ndigitalWrite(trig,LOW);\ndelayMicroseconds(2);\ndigitalWrite(trig,HIGH);\ndelayMicroseconds(10);\ndigitalWrite(trig,LOW);\npinMode(echo, INPUT);\nreturn pulseIn(echo,HIGH,30000)/58.0;\n}\n","work":"getDistance({0},{1})","loop":""}],
@@ -113,7 +118,13 @@
 		{"encode":"{n0}","setup":"","inc":"","def":"double currentTime = 0;\ndouble lastTime = 0;\n--separator--double getLastTime(){\n\treturn currentTime = millis()/1000.0 - lastTime;\n}\n","work":"getLastTime()","loop":""}],
 		
 		["w", "reset timer","resetTimer", "0",
-		{"encode":"{n0}","setup":"","inc":"","def":"double currentTime = 0;\ndouble lastTime = 0;\n","work":"lastTime = millis()/1000.0;\n","loop":""}]
+		{"encode":"{n0}","setup":"","inc":"","def":"double currentTime = 0;\ndouble lastTime = 0;\n","work":"lastTime = millis()/1000.0;\n","loop":""}],
+
+		["w", "Blynk with auth-key %s","Blynkbegin","Your auth key",
+		{"encode":"{0}","setup":"Serial.begin(9600);\nBlynk.begin(Serial, auth);\n","inc":"#define BLYNK_USE_DIRECT_CONNECT\n#include <BlynkSimpleSerialBLE.h>\n","def":"char auth[] = {0};\n","work":"Blynk.run();\n","loop":""}],
+
+		["w", "Virtual pin %n to run servo %n","Virtual Pin","0","9",
+		{"encode":"{0}{1}","setup":"Servo_{1}.attach({1});\n","inc":"#include <Servo.h>\n","def":"Servo Servo_{1};\n--separator--BLYNK_WRITE(V{0}){\nint data{0} = param.asInt();\nServo_{1}.write(data{0});\ndelay(1000);\n}\n","work":"","loop":""}]
 		
 	],
 	"menus": {
