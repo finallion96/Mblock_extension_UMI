@@ -6,7 +6,7 @@
 	"javascriptURL":"js/arduino.js",
 	"author":"~ Hieu.P.M ~ ",
 	"blockSpecs": [
-		["h","UMI Robot","runArduino",{"encode":"","setup":"pixels.begin();\npixels.clear();\npixels.show();\n","inc":"#include <Adafruit_NeoPixel.h>","def":"Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, 13, NEO_GRB + NEO_KHZ800);","work":"","loop":""}],
+		["h","UMI Robot","runArduino",{"encode":"","setup":"pixels.begin();\npixels.clear();\npixels.show();\n","inc":"#include <Adafruit_NeoPixel.h>\n","def":"Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, 13, NEO_GRB + NEO_KHZ800);","work":"","loop":""}],
 
 		["w", "%d.side motor moves %d.direction with speed %n","motor setup","LEFT","Forward","255",
 		{"encode":"{d0}{d1}{d2}","setup":"    pinMode(4,OUTPUT);\n    pinMode(7,OUTPUT);\n    pinMode(5,OUTPUT);\n    pinMode(8,OUTPUT);\n    pinMode(9,OUTPUT);\n    pinMode(6,OUTPUT);\n","inc":"void Motor(boolean side, boolean direction, double speed);\n","def":"--separator--\nvoid Motor(boolean side, boolean direction, double speed)\n{\n  if(side == 0) analogWrite(5,speed);\n  if(side == 1) analogWrite(6,speed);\n  if(side == 0 && direction == 0) digitalWrite(4,0);\n  if(side == 0 && direction == 0) digitalWrite(7,1);\n  if(side == 0 && direction == 1) digitalWrite(4,1);\n  if(side == 0 && direction == 1) digitalWrite(7,0);\n  if(side == 1 && direction == 0) digitalWrite(8,0);\n  if(side == 1 && direction == 0) digitalWrite(9,1);\n  if(side == 1 && direction == 1) digitalWrite(8,1);\n  if(side == 1 && direction == 1) digitalWrite(9,0);\n}","work":"Motor({0},{1},{2});\n","loop":""}],
@@ -32,11 +32,10 @@
 		["B", "read IR code with recv pin %n and code %d.IRcode","myIR","2","Num0",
 		{"encode":"{d0}{d1}","setup":"irrecv_{0}.enableIRIn();\n","inc":"#include <IRremote.h>\n","def":"IRrecv irrecv_{0}({0});\ndecode_results results_{0};\n--separator--int checkIR(unsigned long val)\n{\nint status = 0;\n--separator--if (irrecv_{0}.decode(&results_{0}))\n{\nif (results_{0}.value == val)\n{\nstatus = 1;\n}\nelse\n{\nstatus = 0;\n}\nirrecv_{0}.resume();\n}\nreturn status;\n}\n","work":"checkIR({1})","loop":""}],
 		*/
-
-		/*
+		
 		["w", "send IR code type %d.IRtype output as %d.IRcode","sendIR", "NEC", "ASANO-UP",
 		{"encode":"{d0}{d1}","setup":"","inc":"#include <IRremote.h>\nIRsend irsend;\n","def":"--separator-- void IRsender(long int code, char type)\n{\n	--separator--if(type == 1)\n	{\n		irsend.sendNEC(code, 32);\n		delay(40);\n	}\n	--separator--else if(type == 2)\n	{\n		irsend.sendSony(code, 12);\n		delay(40);\n	}\n	--separator--else\n	{\n		irsend.sendSAMSUNG(code, 32);\n		delay(40);\n	}\n}\n","work":"IRsender({0},{1});\n","loop":""}],
-		*/
+
 
 		["B", "read bluetooth code %d.button with baud-rate %n","check bluetooth","Up","9600",
 		{"encode":"{d0}{d1}","setup":"Serial.begin({1});\n","inc":"","def":"char state = 0;\nunsigned long preSend = 0;\n--separator--void checkBlue()\n--separator--{\nunsigned long nowSend = millis();\n   if(Serial.available() > 0)\n--separator--{\nstate = Serial.read();\n }\nif (nowSend - preSend > 1000)\n--separator--{\nstate = 0;\npreSend = millis();\n}\n}\n","work":"!(state - {0} - 48)","loop":"checkBlue();\n"}],
