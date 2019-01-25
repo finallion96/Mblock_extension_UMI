@@ -1,12 +1,12 @@
 {	"extensionName": "UMI",
-	"version":"2.3",
+	"version":"2.4",
 	"sort":1,
 	"extensionPort": 0,
 	"firmware":"1.1.103",
 	"javascriptURL":"js/arduino.js",
-	"author":"~ Hieu.P.M ~ ",
+	"author":"~ Hieu.P.M & Ninh.D.H ~ ",
 	"blockSpecs": [
-		["h","UMI Robot","runArduino",{"encode":"","setup":"pixels.begin();\npixels.clear();\npixels.show();\n","inc":"#include <Adafruit_NeoPixel.h>\n","def":"Adafruit_NeoPixel pixels = Adafruit_NeoPixel(16, 13, NEO_GRB + NEO_KHZ800);","work":"","loop":""}],
+		["h","UMI Robot","runArduino",{"encode":"","setup":"pixels.begin();\npixels.clear();\npixels.show();\n","inc":"#include <Adafruit_NeoPixel.h>\n","def":"Adafruit_NeoPixel pixels = Adafruit_NeoPixel(17, 13, NEO_GRB + NEO_KHZ800);","work":"","loop":""}],
 
 		["w", "%d.side motor moves %d.direction with speed %n","motor setup","LEFT","Forward","255",
 		{"encode":"{d0}{d1}{d2}","setup":"    pinMode(4,OUTPUT);\n    pinMode(7,OUTPUT);\n    pinMode(5,OUTPUT);\n    pinMode(8,OUTPUT);\n    pinMode(9,OUTPUT);\n    pinMode(6,OUTPUT);\n","inc":"void Motor(boolean side, boolean direction, double speed);\n","def":"--separator--\nvoid Motor(boolean side, boolean direction, double speed)\n{\n  if(side == 0) analogWrite(5,speed);\n  if(side == 1) analogWrite(6,speed);\n  if(side == 0 && direction == 0) digitalWrite(4,0);\n  if(side == 0 && direction == 0) digitalWrite(7,1);\n  if(side == 0 && direction == 1) digitalWrite(4,1);\n  if(side == 0 && direction == 1) digitalWrite(7,0);\n  if(side == 1 && direction == 0) digitalWrite(8,0);\n  if(side == 1 && direction == 0) digitalWrite(9,1);\n  if(side == 1 && direction == 1) digitalWrite(8,1);\n  if(side == 1 && direction == 1) digitalWrite(9,0);\n}","work":"Motor({0},{1},{2});\n","loop":""}],
